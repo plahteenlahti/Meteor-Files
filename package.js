@@ -1,5 +1,5 @@
 Package.describe({
-  name: 'ostrio:files',
+  name: 'plahteenlahti:files',
   version: '3.0.0-beta.1',
   summary: 'Upload files to a server or 3rd party storage: AWS:S3, GridFS, DropBox, and other',
   git: 'https://github.com/veliovgroup/Meteor-Files',
@@ -19,7 +19,7 @@ Package.onUse((api) => {
 
 Package.onTest((api) => {
   api.use('tinytest');
-  api.use(['ecmascript', 'ostrio:files'], ['client', 'server']);
+  api.use(['ecmascript', 'plahteenlahti:files'], ['client', 'server']);
   api.addFiles('tests/helpers.js', ['client', 'server']);
 });
 

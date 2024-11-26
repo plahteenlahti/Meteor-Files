@@ -1,12 +1,12 @@
 ### `FilesCollection.collection` [*Isomorphic*]
 
-*Direct reference to [`Mongo.Collection`](http://docs.meteor.com/#/full/mongo_collection).*
+_Direct reference to [`Mongo.Collection`](http://docs.meteor.com/#/full/mongo_collection)._
 
 ```js
-import { Meteor } from 'meteor/meteor';
-import { FilesCollection } from 'meteor/ostrio:files';
+import { Meteor } from "meteor/meteor";
+import { FilesCollection } from "meteor/plahteenlahti:files";
 
-const imagesCollection = new FilesCollection({collectionName: 'images'});
+const imagesCollection = new FilesCollection({ collectionName: "images" });
 
 if (Meteor.isServer) {
   /* Set deny/allow rules:
@@ -24,30 +24,30 @@ if (Meteor.isServer) {
    * @see http://docs.meteor.com/#/full/deny
    */
   imagesCollection.deny({
-    insert: function() {
+    insert: function () {
       return false;
     },
-    update: function() {
+    update: function () {
       return true;
     },
-    remove: function() {
+    remove: function () {
       return false;
-    }
+    },
   });
 
   /* Allow per action
    * @see http://docs.meteor.com/#/full/allow
    */
   imagesCollection.allow({
-    insert: function() {
+    insert: function () {
       return true;
     },
-    update: function() {
+    update: function () {
       return false;
     },
-    remove: function() {
+    remove: function () {
       return true;
-    }
+    },
   });
 }
 
@@ -58,12 +58,12 @@ imagesCollection.collection.find({}).forEach(function (fileRef) {
 
 // Example: Subscribe:
 if (Meteor.isClient) {
-  Meteor.subscribe('files.images.all');
+  Meteor.subscribe("files.images.all");
 }
 
 // Example: Publish:
 if (Meteor.isServer) {
-  Meteor.publish('files.images.all', function () {
+  Meteor.publish("files.images.all", function () {
     return imagesCollection.collection.find({});
   });
 }
@@ -71,15 +71,18 @@ if (Meteor.isServer) {
 // Publish only necessary fields:
 // See issue #316
 if (Meteor.isServer) {
-  Meteor.publish('files.images.all', function () {
-    return imagesCollection.collection.find({}, {
-      fields: {
-        extension: 1,
-        _downloadRoute: 1,
-        _collectionName: 1,
-        'versions.versionName.extension': 1 // <-- Required only for file's version .link(version), and if extension is different from original file
+  Meteor.publish("files.images.all", function () {
+    return imagesCollection.collection.find(
+      {},
+      {
+        fields: {
+          extension: 1,
+          _downloadRoute: 1,
+          _collectionName: 1,
+          "versions.versionName.extension": 1, // <-- Required only for file's version .link(version), and if extension is different from original file
+        },
       }
-    });
+    );
   });
 }
 ```

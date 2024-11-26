@@ -1,6 +1,6 @@
 # Insert; Upload
 
-__Insert and upload are available only from a *Client*/*Browser*/*Cordova*/etc.__
+**Insert and upload are available only from a _Client_/_Browser_/_Cordova_/etc.**
 
 ```js
 FilesCollection#insert(settings, autoStart); //[*Client*]
@@ -240,7 +240,7 @@ Upload file to a Server via DDP or HTTP.
   </tbody>
 </table>
 
-`FilesCollection#insert()` method returns `FileUpload` class instance. __Note__: same instance is used *context* in all callback functions (*see above*)
+`FilesCollection#insert()` method returns `FileUpload` class instance. **Note**: same instance is used _context_ in all callback functions (_see above_)
 
 ## `FileUpload`
 
@@ -532,15 +532,15 @@ Upload file to a Server via DDP or HTTP.
   </tbody>
 </table>
 
-When `autoStart` *is* `false` *before calling* `.start()` you can "pipe" data through any function, data comes as Base64 string (DataURL). You must return Base64 string from piping function, for more info - see example below. __Do not forget to change file name, extension and mime-type if required__.
+When `autoStart` _is_ `false` _before calling_ `.start()` you can "pipe" data through any function, data comes as Base64 string (DataURL). You must return Base64 string from piping function, for more info - see example below. **Do not forget to change file name, extension and mime-type if required**.
 
-The `fileData` object (*see above*):
+The `fileData` object (_see above_):
 
-- `size` {*Number*} - File size in bytes
-- `type` {*String*}
-- `mime`, `mime-type` {*String*}
-- `ext`, `extension` {*String*}
-- `name` {*String*} - File name
+- `size` {_Number_} - File size in bytes
+- `type` {_String_}
+- `mime`, `mime-type` {_String_}
+- `ext`, `extension` {_String_}
+- `name` {_String_} - File name
 
 ## Examples
 
@@ -564,9 +564,9 @@ Shared code:
 
 ```js
 // /imports/collections/images.js
-import { FilesCollection } from 'meteor/ostrio:files';
+import { FilesCollection } from "meteor/plahteenlahti:files";
 
-const imagesCollection = new FilesCollection({collectionName: 'images'});
+const imagesCollection = new FilesCollection({ collectionName: "images" });
 // Export created instance of the FilesCollection
 export { imagesCollection };
 ```
@@ -574,9 +574,9 @@ export { imagesCollection };
 Client's code:
 
 ```js
-import { ReactiveVar } from 'meteor/reactive-var';
-import { Template }    from 'meteor/templating';
-import { imagesCollection }      from '/imports/collections/images.js';
+import { ReactiveVar } from "meteor/reactive-var";
+import { Template } from "meteor/templating";
+import { imagesCollection } from "/imports/collections/images.js";
 
 Template.uploadForm.onCreated(function () {
   this.currentFile = new ReactiveVar(false);
@@ -585,11 +585,11 @@ Template.uploadForm.onCreated(function () {
 Template.uploadForm.helpers({
   currentFile() {
     Template.instance().currentFile.get();
-  }
+  },
 });
 
 Template.uploadForm.events({
-  'change #fileInput'(e, template) {
+  "change #fileInput"(e, template) {
     if (e.currentTarget.files && e.currentTarget.files[0]) {
       // We upload only one file, in case
       // there was multiple files selected
@@ -602,16 +602,16 @@ Template.uploadForm.events({
         },
         onUploaded(error, fileObj) {
           if (error) {
-            alert('Error during upload: ' + error);
+            alert("Error during upload: " + error);
           } else {
             alert(`File "${fileObj.name}" successfully uploaded`);
           }
           template.currentFile.set(false);
         },
-        chunkSize: 'dynamic'
+        chunkSize: "dynamic",
       });
     }
-  }
+  },
 });
 ```
 
@@ -620,29 +620,36 @@ Template.uploadForm.events({
 Events-driven upload
 
 ```js
-import { Template } from 'meteor/templating';
-import { imagesCollection }   from '/imports/collections/images.js';
+import { Template } from "meteor/templating";
+import { imagesCollection } from "/imports/collections/images.js";
 
 Template.uploadForm.events({
-  'change #fileInput'(e, template) {
+  "change #fileInput"(e, template) {
     if (e.currentTarget.files && e.currentTarget.files[0]) {
       // We upload only one file, in case
       // multiple files were selected
-      imagesCollection.insert({
-        file: e.currentTarget.files[0],
-        chunkSize: 'dynamic'
-      }, false).on('start', function () {
-        template.currentFile.set(this);
-      }).on('end', function (error, fileObj) {
-        if (error) {
-          alert('Error during upload: ' + error);
-        } else {
-          alert(`File "${fileObj.name}" successfully uploaded`);
-        }
-        template.currentFile.set(false);
-      }).start();
+      imagesCollection
+        .insert(
+          {
+            file: e.currentTarget.files[0],
+            chunkSize: "dynamic",
+          },
+          false
+        )
+        .on("start", function () {
+          template.currentFile.set(this);
+        })
+        .on("end", function (error, fileObj) {
+          if (error) {
+            alert("Error during upload: " + error);
+          } else {
+            alert(`File "${fileObj.name}" successfully uploaded`);
+          }
+          template.currentFile.set(false);
+        })
+        .start();
     }
-  }
+  },
 });
 ```
 
@@ -651,76 +658,79 @@ Template.uploadForm.events({
 Another way to upload using events:
 
 ```js
-import { Template } from 'meteor/templating';
-import { imagesCollection }   from '/imports/collections/images.js';
+import { Template } from "meteor/templating";
+import { imagesCollection } from "/imports/collections/images.js";
 
 Template.uploadForm.events({
-  'change #fileInput'(e, template) {
+  "change #fileInput"(e, template) {
     if (e.currentTarget.files && e.currentTarget.files[0]) {
-      const uploader = imagesCollection.insert({
-        file: e.currentTarget.files[0],
-        chunkSize: 'dynamic'
-      }, false);
+      const uploader = imagesCollection.insert(
+        {
+          file: e.currentTarget.files[0],
+          chunkSize: "dynamic",
+        },
+        false
+      );
 
-      uploader.on('start', function () {
+      uploader.on("start", function () {
         template.currentFile.set(this);
       });
 
-      uploader.on('end', function (error, fileObj) {
+      uploader.on("end", function (error, fileObj) {
         template.currentFile.set(false);
       });
 
-      uploader.on('uploaded', function (error, fileObj) {
+      uploader.on("uploaded", function (error, fileObj) {
         if (!error) {
           alert(`File "${fileObj.name}" successfully uploaded`);
         }
       });
 
-      uploader.on('error', function (error, fileObj) {
-        alert('Error during upload: ' + error);
+      uploader.on("error", function (error, fileObj) {
+        alert("Error during upload: " + error);
       });
 
       uploader.start();
     }
-  }
+  },
 });
 ```
 
 ### Upload base64 String
 
 ```js
-import { imagesCollection } from '/imports/collections/images.js';
+import { imagesCollection } from "/imports/collections/images.js";
 
 // As dataURI
 imagesCollection.insert({
-  file: 'data:image/png,base64str…',
+  file: "data:image/png,base64str…",
   isBase64: true, // <— Mandatory
-  fileName: 'pic.png' // <— Mandatory
+  fileName: "pic.png", // <— Mandatory
 });
 
 // As base64:
 imagesCollection.insert({
-  file: 'image/png,base64str…',
+  file: "image/png,base64str…",
   isBase64: true, // <— Mandatory
-  fileName: 'pic.png' // <— Mandatory
+  fileName: "pic.png", // <— Mandatory
 });
 
 // As plain base64:
 imagesCollection.insert({
-  file: 'base64str…',
+  file: "base64str…",
   isBase64: true, // <— Mandatory
-  fileName: 'pic.png', // <— Mandatory
-  type: 'image/png' // <— Mandatory
+  fileName: "pic.png", // <— Mandatory
+  type: "image/png", // <— Mandatory
 });
 ```
 
 ### Piping
 
-Note: data flow in `ddp` and `http` uses dataURI (e.g. *Base64*)
+Note: data flow in `ddp` and `http` uses dataURI (e.g. _Base64_)
 
 ```js
-import { Template } from 'meteor/templating';
-import { imagesCollection }   from '/imports/collections/images.js';
+import { Template } from "meteor/templating";
+import { imagesCollection } from "/imports/collections/images.js";
 
 const encrypt = function encrypt(data) {
   return someHowEncryptAndReturnAsBase64(data);
@@ -731,15 +741,22 @@ const zip = function zip(data) {
 };
 
 Template.uploadForm.events({
-  'change #fileInput'(e) {
+  "change #fileInput"(e) {
     if (e.currentTarget.files && e.currentTarget.files[0]) {
       // We upload only one file, in case
       // multiple files were selected
-      imagesCollection.insert({
-        file: e.currentTarget.files[0],
-        chunkSize: 'dynamic'
-      }, false).pipe(encrypt).pipe(zip).start();
+      imagesCollection
+        .insert(
+          {
+            file: e.currentTarget.files[0],
+            chunkSize: "dynamic",
+          },
+          false
+        )
+        .pipe(encrypt)
+        .pipe(zip)
+        .start();
     }
-  }
+  },
 });
 ```

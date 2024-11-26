@@ -1,4 +1,4 @@
-import { FilesCollection } from 'meteor/ostrio:files';
+import { FilesCollection } from 'meteor/plahteenlahti:files';
 
 Tinytest.add('Helpers - isUndefined', test => {
   test.isFalse(FilesCollection.__helpers.isUndefined(null), 'isUndefined - null false');

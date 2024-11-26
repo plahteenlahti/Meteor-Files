@@ -1,11 +1,11 @@
 ### Use GridFS with `gridfs-stream` as a storage
 
 > :warning: **Deprecation warning:** The `gridfs-stream` [has not been updated in a long time](https://github.com/aheckmann/gridfs-stream) and its implementation relies on the deprecated [`GridStore API`](https://mongodb.github.io/node-mongodb-native/3.6/api/GridStore.html). An alternative is to use the Mongo driver's native `GridFSBucket`, which is also [described in
-this wiki](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/gridfs-bucket-integration.md).
+> this wiki](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/gridfs-bucket-integration.md).
 
 Example below shows how to handle (store, serve, remove) uploaded files via GridFS.
 
-Please note - by default all files will be served with `200` response code, which is fine if you planning to deal only with small files, or not planning to serve files back to users (*use only upload and storage*). For support of `206` partial content see [this article](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/gridfs-streaming.md).
+Please note - by default all files will be served with `200` response code, which is fine if you planning to deal only with small files, or not planning to serve files back to users (_use only upload and storage_). For support of `206` partial content see [this article](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/gridfs-streaming.md).
 
 ### Preparation
 
@@ -26,16 +26,17 @@ meteor npm install --save gridfs-stream
 Create a `FilesCollection` instance:
 
 ```javascript
-import { Meteor } from 'meteor/meteor';
-import { FilesCollection } from 'meteor/ostrio:files';
+import { Meteor } from "meteor/meteor";
+import { FilesCollection } from "meteor/plahteenlahti:files";
 
 export const imagesCollection = new FilesCollection({
   debug: false, // Change to `true` for debugging
-  collectionName: 'images',
+  collectionName: "images",
   allowClientCode: false,
   onBeforeUpload(file) {
-    if (file.size <= 10485760 && /png|jpg|jpeg/i.test(file.extension)) return true;
-    return 'Please upload image, with size equal or less than 10MB';
+    if (file.size <= 10485760 && /png|jpg|jpeg/i.test(file.extension))
+      return true;
+    return "Please upload image, with size equal or less than 10MB";
   },
 });
 
@@ -49,9 +50,9 @@ if (Meteor.isServer) {
 Import and set up required variables:
 
 ```javascript
-import Grid from 'gridfs-stream'; // We'll use this package to work with GridFS
-import fs from 'fs';              // Required to read files initially uploaded via Meteor-Files
-import { MongoInternals } from 'meteor/mongo';
+import Grid from "gridfs-stream"; // We'll use this package to work with GridFS
+import fs from "fs"; // Required to read files initially uploaded via Meteor-Files
+import { MongoInternals } from "meteor/mongo";
 
 // Set up gfs instance
 let gfs;
@@ -121,11 +122,11 @@ So let's fix this by adding `onAfterRemove` hook:
 Here's a final code:
 
 ```javascript
-import { Meteor } from 'meteor/meteor';
-import { FilesCollection } from 'meteor/ostrio:files';
-import Grid from 'gridfs-stream';
-import { MongoInternals } from 'meteor/mongo';
-import fs from 'fs';
+import { Meteor } from "meteor/meteor";
+import { FilesCollection } from "meteor/plahteenlahti:files";
+import Grid from "gridfs-stream";
+import { MongoInternals } from "meteor/mongo";
+import fs from "fs";
 
 let gfs;
 if (Meteor.isServer) {
@@ -136,29 +137,42 @@ if (Meteor.isServer) {
 }
 
 export const imagesCollection = new FilesCollection({
-  collectionName: 'images',
+  collectionName: "images",
   allowClientCode: false,
-  debug: Meteor.isServer && process.env.NODE_ENV === 'development',
+  debug: Meteor.isServer && process.env.NODE_ENV === "development",
   onBeforeUpload(file) {
-    if (file.size <= 10485760 && /png|jpg|jpeg/i.test(file.extension)) return true;
-    return 'Please upload image, with size equal or less than 10MB';
+    if (file.size <= 10485760 && /png|jpg|jpeg/i.test(file.extension))
+      return true;
+    return "Please upload image, with size equal or less than 10MB";
   },
   onAfterUpload(image) {
     // Move file to GridFS
-    Object.keys(image.versions).forEach(versionName => {
-      const metadata = { versionName, imageId: image._id, storedAt: new Date() }; // Optional
-      const writeStream = gfs.createWriteStream({ filename: image.name, metadata });
+    Object.keys(image.versions).forEach((versionName) => {
+      const metadata = {
+        versionName,
+        imageId: image._id,
+        storedAt: new Date(),
+      }; // Optional
+      const writeStream = gfs.createWriteStream({
+        filename: image.name,
+        metadata,
+      });
 
       fs.createReadStream(image.versions[versionName].path).pipe(writeStream);
 
-      writeStream.on('close', Meteor.bindEnvironment(file => {
-        const property = `versions.${versionName}.meta.gridFsFileId`;
+      writeStream.on(
+        "close",
+        Meteor.bindEnvironment((file) => {
+          const property = `versions.${versionName}.meta.gridFsFileId`;
 
-        // If we store the ObjectID itself, Meteor (EJSON?) seems to convert it to a
-        // LocalCollection.ObjectID, which GFS doesn't understand.
-        this.collection.update(image._id, { $set: { [property]: file._id.toString() } });
-        this.unlink(this.collection.findOne(image._id), versionName); // Unlink files from FS
-      }));
+          // If we store the ObjectID itself, Meteor (EJSON?) seems to convert it to a
+          // LocalCollection.ObjectID, which GFS doesn't understand.
+          this.collection.update(image._id, {
+            $set: { [property]: file._id.toString() },
+          });
+          this.unlink(this.collection.findOne(image._id), versionName); // Unlink files from FS
+        })
+      );
     });
   },
   interceptDownload(http, image, versionName) {
@@ -166,26 +180,29 @@ export const imagesCollection = new FilesCollection({
     const _id = (image.versions[versionName].meta || {}).gridFsFileId;
     if (_id) {
       const readStream = gfs.createReadStream({ _id });
-      readStream.on('error', err => {
+      readStream.on("error", (err) => {
         // File not found Error handling without Server Crash
         http.response.statusCode = 404;
-        http.response.end('file not found');
+        http.response.end("file not found");
         console.log(`chunk of file ${file._id}/${file.name} was not found`);
       });
-      http.response.setHeader('Cache-Control', this.cacheControl);
+      http.response.setHeader("Cache-Control", this.cacheControl);
       readStream.pipe(http.response);
     }
     return Boolean(_id); // Serve file from either GridFS or FS if it wasn't uploaded yet
   },
   onAfterRemove(images) {
     // Remove corresponding file from GridFS
-    images.forEach(image => {
-      Object.keys(image.versions).forEach(versionName => {
+    images.forEach((image) => {
+      Object.keys(image.versions).forEach((versionName) => {
         const _id = (image.versions[versionName].meta || {}).gridFsFileId;
-        if (_id) gfs.remove({ _id }, err => { if (err) throw err; });
+        if (_id)
+          gfs.remove({ _id }, (err) => {
+            if (err) throw err;
+          });
       });
     });
-  }
+  },
 });
 
 if (Meteor.isServer) {

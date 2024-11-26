@@ -5,7 +5,7 @@ The Javascript Mongo driver (the one that Meteor uses under the hood) allows to 
 [so called "Buckets"](http://mongodb.github.io/node-mongodb-native/3.6/api/GridFSBucket.html).
 
 The Buckets are basically named collections for storing the file's metadata and chunkdata.
-This allows to *horizontally scale your files* the same way you do with your document collections.
+This allows to _horizontally scale your files_ the same way you do with your document collections.
 
 **A note for beginners:** This tutorial is a bit advanced and we try to explain the involved steps as detailed as
 possible. If you still need some reference to play with, we have set up an example project. The project
@@ -16,15 +16,15 @@ is available via [`files-gridfs-autoform-example`](https://github.com/veliovgrou
 The [MongoDB documentation on GridFS](https://docs.mongodb.com/manual/core/gridfs/) defines it as the following:
 
 > GridFS is a specification for storing and retrieving files that exceed the BSON-document size limit of 16 MB.
->  
+>
 > Instead of storing a file in a single document, GridFS divides the file into parts, or chunks [1], and stores each
-chunk as a separate document. By default, GridFS uses a default chunk size of 255 kB; that is, GridFS divides a file
-into chunks of 255 kB with the exception of the last chunk. The last chunk is only as large as necessary.
-Similarly, files that are no larger than the chunk size only have a final chunk, using only as much space as needed
-plus some additional metadata.
+> chunk as a separate document. By default, GridFS uses a default chunk size of 255 kB; that is, GridFS divides a file
+> into chunks of 255 kB with the exception of the last chunk. The last chunk is only as large as necessary.
+> Similarly, files that are no larger than the chunk size only have a final chunk, using only as much space as needed
+> plus some additional metadata.
 
 Please note - by default all files will be served with `200` response code, which is fine if you planning to deal
-only with small files, or not planning to serve files back to users (*use only upload and storage*).
+only with small files, or not planning to serve files back to users (_use only upload and storage_).
 For support of `206` partial content see [this article](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/gridfs-streaming.md).
 
 ## 1. Create a `GridFSBucket` factory
@@ -35,18 +35,21 @@ This is similar to creating a collection using a name for documents.
 The following code is a helper function to create a bucket. It can easily be extended to accept more options:
 
 ```js
-import { MongoInternals } from 'meteor/mongo';
+import { MongoInternals } from "meteor/mongo";
 
 export const createBucket = (bucketName) => {
-  const options = bucketName ? {bucketName} : (void 0);
-  return new MongoInternals.NpmModules.mongodb.module.GridFSBucket(MongoInternals.defaultRemoteCollectionDriver().mongo.db, options);
-}
+  const options = bucketName ? { bucketName } : void 0;
+  return new MongoInternals.NpmModules.mongodb.module.GridFSBucket(
+    MongoInternals.defaultRemoteCollectionDriver().mongo.db,
+    options
+  );
+};
 ```
 
 You could later create a bucket, say `allImages`, like so
 
 ```javascript
-const imagesBucket = createBucket('allImages');
+const imagesBucket = createBucket("allImages");
 ```
 
 It will be used as target when moving images to your GridFS.
@@ -57,22 +60,23 @@ For compatibility reasons we need support native Mongo `ObjectId` values. In ord
 we also wrap this in a function:
 
 ```js
-import { MongoInternals } from 'meteor/mongo';
+import { MongoInternals } from "meteor/mongo";
 
-export const createObjectId = ({ gridFsFileId }) => new MongoInternals.NpmModules.mongodb.module.ObjectID(gridFsFileId);
+export const createObjectId = ({ gridFsFileId }) =>
+  new MongoInternals.NpmModules.mongodb.module.ObjectID(gridFsFileId);
 ```
 
 ## 3. Create an upload handler for the bucket
 
 Our `FilesCollection` will move the files to the GridFS using the `onAfterUpload` handler.
-In order to stay flexible enough in the choice of the bucket  we use a factory function:
+In order to stay flexible enough in the choice of the bucket we use a factory function:
 
 ```js
-import { Meteor } from 'meteor/meteor';
-import fs from 'fs';
+import { Meteor } from "meteor/meteor";
+import fs from "fs";
 
-export const createOnAfterUpload = bucket =>
-  function onAfterUpload (file) {
+export const createOnAfterUpload = (bucket) =>
+  function onAfterUpload(file) {
     const self = this;
 
     // here you could manipulate your file
@@ -80,23 +84,22 @@ export const createOnAfterUpload = bucket =>
     // ...
 
     // then we read all versions we have got so far
-    Object.keys(file.versions).forEach(versionName => {
+    Object.keys(file.versions).forEach((versionName) => {
       const metadata = { ...file.meta, versionName, fileId: file._id };
-      fs.createReadStream(file.versions[ versionName ].path)
+      fs.createReadStream(file.versions[versionName].path)
 
-      // this is where we upload the binary to the bucket using bucket.openUploadStream
-      // see http://mongodb.github.io/node-mongodb-native/3.6/api/GridFSBucket.html#openUploadStream 
-        .pipe(bucket.openUploadStream(
-          file.name,
-          {
-            contentType: file.type || 'binary/octet-stream',
-            metadata
-          }
-        ))
+        // this is where we upload the binary to the bucket using bucket.openUploadStream
+        // see http://mongodb.github.io/node-mongodb-native/3.6/api/GridFSBucket.html#openUploadStream
+        .pipe(
+          bucket.openUploadStream(file.name, {
+            contentType: file.type || "binary/octet-stream",
+            metadata,
+          })
+        )
 
         // and we unlink the file from the fs on any error
         // that occurred during the upload to prevent zombie files
-        .on('error', err => {
+        .on("error", (err) => {
           console.error(err);
           self.unlink(this.collection.findOne(file._id), versionName); // Unlink files from FS
         })
@@ -104,17 +107,20 @@ export const createOnAfterUpload = bucket =>
         // once we are finished, we attach the gridFS Object id on the
         // FilesCollection document's meta section and finally unlink the
         // upload file from the filesystem
-        .on('finish', Meteor.bindEnvironment(ver => {
-          const property = `versions.${versionName}.meta.gridFsFileId`;
-          
-          self.collection.update(file._id, {
-            $set: {
-              [ property ]: ver._id.toHexString(),
-            }
-          });
-          
-          self.unlink(this.collection.findOne(file._id), versionName); // Unlink files from FS
-        }));
+        .on(
+          "finish",
+          Meteor.bindEnvironment((ver) => {
+            const property = `versions.${versionName}.meta.gridFsFileId`;
+
+            self.collection.update(file._id, {
+              $set: {
+                [property]: ver._id.toHexString(),
+              },
+            });
+
+            self.unlink(this.collection.findOne(file._id), versionName); // Unlink files from FS
+          })
+        );
     });
   };
 ```
@@ -125,40 +131,48 @@ We also need to handle to retrieve files from GridFS when a download is initiate
 factory function as in step 3:
 
 ```js
-import { createObjectId } from '../createObjectId';
+import { createObjectId } from "../createObjectId";
 
-export const createInterceptDownload = bucket =>
-  function interceptDownload (http, file, versionName) {
-    const { gridFsFileId } = file.versions[ versionName ].meta || {};
+export const createInterceptDownload = (bucket) =>
+  function interceptDownload(http, file, versionName) {
+    const { gridFsFileId } = file.versions[versionName].meta || {};
     if (gridFsFileId) {
       // opens the download stream using a given gfs id
       // see: http://mongodb.github.io/node-mongodb-native/3.6/api/GridFSBucket.html#openDownloadStream
       const gfsId = createObjectId({ gridFsFileId });
       const readStream = bucket.openDownloadStream(gfsId);
 
-      readStream.on('data', (data) => {
+      readStream.on("data", (data) => {
         http.response.write(data);
       });
 
-      readStream.on('end', () => {
-        http.response.end('end');
+      readStream.on("end", () => {
+        http.response.end("end");
       });
 
-      readStream.on('error', () => {
+      readStream.on("error", () => {
         // not found probably
         // eslint-disable-next-line no-param-reassign
         http.response.statusCode = 404;
-        http.response.end('not found');
+        http.response.end("not found");
       });
 
-      http.response.setHeader('Cache-Control', this.cacheControl);
-      
-      const dispositionName = "filename=\"" + (encodeURIComponent(file.name)) + "\"; filename=*UTF-8\"" + (encodeURIComponent(file.name)) + "\"; ";
-      const dispositionEncoding = 'charset=utf-8';
-      http.response.setHeader('Content-Disposition', dispositionType + dispositionName + dispositionEncoding);
+      http.response.setHeader("Cache-Control", this.cacheControl);
+
+      const dispositionName =
+        'filename="' +
+        encodeURIComponent(file.name) +
+        '"; filename=*UTF-8"' +
+        encodeURIComponent(file.name) +
+        '"; ';
+      const dispositionEncoding = "charset=utf-8";
+      http.response.setHeader(
+        "Content-Disposition",
+        dispositionType + dispositionName + dispositionEncoding
+      );
     }
     return Boolean(gridFsFileId); // Serve file from either GridFS or FS if it wasn't uploaded yet
-  }
+  };
 ```
 
 ## 5. Create remove handler
@@ -167,22 +181,23 @@ Finally we need a handler that removes the chunks from the respective GridFS buc
 is removing the file handle:
 
 ```js
-import { createObjectId } from '../createObjectId'
+import { createObjectId } from "../createObjectId";
 
-export const createOnAfterRemove = bucket =>
-  function onAfterRemove (files) {
-    files.forEach(file => {
-      Object.keys(file.versions).forEach(versionName => {
-        const gridFsFileId = (file.versions[ versionName ].meta || {}).gridFsFileId;
+export const createOnAfterRemove = (bucket) =>
+  function onAfterRemove(files) {
+    files.forEach((file) => {
+      Object.keys(file.versions).forEach((versionName) => {
+        const gridFsFileId = (file.versions[versionName].meta || {})
+          .gridFsFileId;
         if (gridFsFileId) {
           const gfsId = createObjectId({ gridFsFileId });
-          bucket.delete(gfsId, err => {
-             if (err) console.error(err);
+          bucket.delete(gfsId, (err) => {
+            if (err) console.error(err);
           });
         }
       });
     });
-  }
+  };
 ```
 
 ## 6. Create `FilesCollection`
@@ -191,37 +206,40 @@ With all our given factories we can flexibly Create a `FilesCollection` instance
 Let's use the previously mentioned `allImages` bucket to create our `Images` collection:
 
 ```js
-import { Meteor } from 'meteor/meteor';
-import { FilesCollection } from 'meteor/ostrio:files';
-import { createBucket } from 'path/to/createBucket'
-import { createOnAfterUpload } from 'path/to/createOnAfterUpload'
-import { createInterceptDownload } from 'path/to/createInterceptDownload'
-import { createOnAfterRemove } from 'path/to/createOnAfterRemove'
+import { Meteor } from "meteor/meteor";
+import { FilesCollection } from "meteor/plahteenlahti:files";
+import { createBucket } from "path/to/createBucket";
+import { createOnAfterUpload } from "path/to/createOnAfterUpload";
+import { createInterceptDownload } from "path/to/createInterceptDownload";
+import { createOnAfterRemove } from "path/to/createOnAfterRemove";
 
-const imageBucket = createBucket('allImages');
+const imageBucket = createBucket("allImages");
 
 export const imagesCollection = new FilesCollection({
   debug: false, // Change to `true` for debugging
-  collectionName: 'images',
+  collectionName: "images",
   allowClientCode: false,
   onBeforeUpload(file) {
-    if (file.size <= 10485760 && /png|jpg|jpeg/i.test(file.extension)) return true;
-    return 'Please upload image, with size equal or less than 10MB';
+    if (file.size <= 10485760 && /png|jpg|jpeg/i.test(file.extension))
+      return true;
+    return "Please upload image, with size equal or less than 10MB";
   },
   onAfterUpload: createOnAfterUpload(imageBucket),
   interceptDownload: createInterceptDownload(imageBucket),
-  onAfterRemove: createOnAfterRemove(imageBucket)
+  onAfterRemove: createOnAfterRemove(imageBucket),
 });
 
 if (Meteor.isServer) {
   imagesCollection.denyClient();
-  
+
   // demo / testing only:
-  Meteor.publish('files.images.all', () => imagesCollection.collection.find({}));
+  Meteor.publish("files.images.all", () =>
+    imagesCollection.collection.find({})
+  );
 }
 
 if (Meteor.isClient) {
-  Meteor.subscribe('files.images.all');
+  Meteor.subscribe("files.images.all");
 }
 ```
 

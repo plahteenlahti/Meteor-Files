@@ -1,6 +1,6 @@
 ### `new FilesCollection([config])` [*Isomorphic*]
 
-*Initialize FilesCollection collection.*
+_Initialize FilesCollection collection._
 
 <table valign="top">
   <thead>
@@ -968,18 +968,18 @@
 ### Examples:
 
 ```js
-import { FilesCollection, helpers } from 'meteor/ostrio:files';
+import { FilesCollection, helpers } from "meteor/plahteenlahti:files";
 
 const imagesCollection = new FilesCollection({
-  storagePath: 'assets/app/uploads/images',
-  downloadRoute: '/files/images',
-  collectionName: 'images',
+  storagePath: "assets/app/uploads/images",
+  downloadRoute: "/files/images",
+  collectionName: "images",
   permissions: 0o755,
   allowClientCode: false,
-  cacheControl: 'public, max-age=31536000',
+  cacheControl: "public, max-age=31536000",
   // Read more about cacheControl: https://devcenter.heroku.com/articles/increasing-application-performance-with-http-cache-headers
   onbeforeunloadMessage() {
-    return 'Upload is still in progress! Upload will be aborted if you leave this page!';
+    return "Upload is still in progress! Upload will be aborted if you leave this page!";
   },
   onBeforeUpload(file) {
     // Allow upload files under 10MB, and only in png/jpg/jpeg formats
@@ -991,12 +991,12 @@ const imagesCollection = new FilesCollection({
     if (file.size <= 10485760 && /png|jpe?g/i.test(file.ext)) {
       return true;
     }
-    return 'Please upload image, with size equal or less than 10MB';
+    return "Please upload image, with size equal or less than 10MB";
   },
   downloadCallback(fileObj) {
-    if (this.params.query.download == 'true') {
+    if (this.params.query.download == "true") {
       // Increment downloads counter
-      imagesCollection.update(fileObj._id, {$inc: {'meta.downloads': 1}});
+      imagesCollection.update(fileObj._id, { $inc: { "meta.downloads": 1 } });
     }
     // Must return true to continue download
     return true;
@@ -1025,28 +1025,32 @@ Attach SimpleSchema and `.denyClient` insecure calls to limit window for error
 
 #### Attach schema [*Isomorphic*]:
 
-*To attach schema, use/install [`aldeed:collection2`](https://github.com/aldeed/meteor-collection2) and [simple-schema](https://atmospherejs.com/aldeed/simple-schema) packages.*
+_To attach schema, use/install [`aldeed:collection2`](https://github.com/aldeed/meteor-collection2) and [simple-schema](https://atmospherejs.com/aldeed/simple-schema) packages._
 
 ```js
-import { FilesCollection } from 'meteor/ostrio:files';
-const imagesCollection = new FilesCollection({/* ... */});
-imagesCollection.collection.attachSchema(new SimpleSchema(imagesCollection.schema));
+import { FilesCollection } from "meteor/plahteenlahti:files";
+const imagesCollection = new FilesCollection({
+  /* ... */
+});
+imagesCollection.collection.attachSchema(
+  new SimpleSchema(imagesCollection.schema)
+);
 ```
 
-*You're free to extend the schema to include your own properties. The default schema is stored under* `FilesCollection.schema` *object.*
+_You're free to extend the schema to include your own properties. The default schema is stored under_ `FilesCollection.schema` _object._
 
 ```js
-import { FilesCollection } from 'meteor/ostrio:files';
+import { FilesCollection } from "meteor/plahteenlahti:files";
 const mySchema = {
   ...FilesCollection.schema,
   myProp: String,
   myOtherProp: {
-    type: Array
-  }
+    type: Array,
+  },
 };
 const imagesCollection = new FilesCollection({
   /* ... */
-  schema: mySchema
+  schema: mySchema,
 });
 imagesCollection.collection.attachSchema(new SimpleSchema(mySchema));
 ```
@@ -1056,11 +1060,13 @@ imagesCollection.collection.attachSchema(new SimpleSchema(mySchema));
 Deny insert/update/remove from client
 
 ```js
-import { Meteor } from 'meteor/meteor';
-import { FilesCollection } from 'meteor/ostrio:files';
+import { Meteor } from "meteor/meteor";
+import { FilesCollection } from "meteor/plahteenlahti:files";
 
 if (Meteor.isServer) {
-  const imagesCollection = new FilesCollection({/* ... */});
+  const imagesCollection = new FilesCollection({
+    /* ... */
+  });
   imagesCollection.deny({
     insert() {
       return true;
@@ -1070,7 +1076,7 @@ if (Meteor.isServer) {
     },
     remove() {
       return true;
-    }
+    },
   });
 
   /* Equal shortcut: */
@@ -1083,11 +1089,13 @@ if (Meteor.isServer) {
 Allow insert/update/remove from client
 
 ```js
-import { Meteor } from 'meteor/meteor';
-import { FilesCollection } from 'meteor/ostrio:files';
+import { Meteor } from "meteor/meteor";
+import { FilesCollection } from "meteor/plahteenlahti:files";
 
 if (Meteor.isServer) {
-  const imagesCollection = new FilesCollection({/* ... */});
+  const imagesCollection = new FilesCollection({
+    /* ... */
+  });
   imagesCollection.allow({
     insert() {
       return true;
@@ -1097,7 +1105,7 @@ if (Meteor.isServer) {
     },
     remove() {
       return true;
-    }
+    },
   });
 
   /* Equal shortcut: */
@@ -1108,10 +1116,12 @@ if (Meteor.isServer) {
 #### Events listeners:
 
 ```js
-import { FilesCollection } from 'meteor/ostrio:files';
-const imagesCollection = new FilesCollection({/* ... */});
+import { FilesCollection } from "meteor/plahteenlahti:files";
+const imagesCollection = new FilesCollection({
+  /* ... */
+});
 // Alias addListener
-imagesCollection.on('afterUpload', function (fileRef) {
+imagesCollection.on("afterUpload", function (fileRef) {
   /* `this` context is the imagesCollection (FilesCollection) instance */
 });
 ```
@@ -1119,14 +1129,14 @@ imagesCollection.on('afterUpload', function (fileRef) {
 #### Use onBeforeUpload to avoid unauthorized upload:
 
 ```js
-import { FilesCollection } from 'meteor/ostrio:files';
+import { FilesCollection } from "meteor/plahteenlahti:files";
 const imagesCollection = new FilesCollection({
-  collectionName: 'images',
+  collectionName: "images",
   allowClientCode: true,
   onBeforeUpload() {
     if (this.userId) {
       const user = this.user();
-      if (user.profile.role === 'admin') {
+      if (user.profile.role === "admin") {
         // Allow upload only if
         // current user is signed-in
         // and has role is `admin`
@@ -1134,8 +1144,8 @@ const imagesCollection = new FilesCollection({
       }
     }
 
-    return 'Not enough rights to upload a file!';
-  }
+    return "Not enough rights to upload a file!";
+  },
 });
 ```
 
@@ -1144,14 +1154,14 @@ const imagesCollection = new FilesCollection({
 For more info see [remove method](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/remove.md).
 
 ```js
-import { FilesCollection } from 'meteor/ostrio:files';
+import { FilesCollection } from "meteor/plahteenlahti:files";
 const imagesCollection = new FilesCollection({
-  collectionName: 'images',
+  collectionName: "images",
   allowClientCode: true,
   onBeforeRemove() {
     if (this.userId) {
       const user = this.user();
-      if (user.profile.role === 'admin') {
+      if (user.profile.role === "admin") {
         // Allow removal only if
         // current user is signed-in
         // and has role is `admin`
@@ -1160,7 +1170,7 @@ const imagesCollection = new FilesCollection({
     }
 
     return false;
-  }
+  },
 });
 ```
 
@@ -1169,25 +1179,28 @@ const imagesCollection = new FilesCollection({
 For additional security, it's recommended to verify the mimetype by looking at the content of the file and delete it, if it looks malicious. E.g. you can use [`mmmagic` package](https://github.com/mscdex/mmmagic) for this:
 
 ```js
-import { Meteor } from 'meteor/meteor';
-import { FilesCollection } from 'meteor/ostrio:files';
+import { Meteor } from "meteor/meteor";
+import { FilesCollection } from "meteor/plahteenlahti:files";
 
 const imagesCollection = new FilesCollection({
-  collectionName: 'images',
+  collectionName: "images",
   onAfterUpload(file) {
     if (Meteor.isServer) {
       // check real mimetype
-      const { Magic, MAGIC_MIME_TYPE } = require('mmmagic');
+      const { Magic, MAGIC_MIME_TYPE } = require("mmmagic");
       const magic = new Magic(MAGIC_MIME_TYPE);
-      magic.detectFile(file.path, Meteor.bindEnvironment((err, mimeType) => {
-        if (err || !mimeType.includes('image')) {
-          // is not a real image --> delete
-          console.log('onAfterUpload, not an image: ', file.path);
-          console.log('deleted', file.path);
-          this.remove(file._id);
-        }
-      }));
+      magic.detectFile(
+        file.path,
+        Meteor.bindEnvironment((err, mimeType) => {
+          if (err || !mimeType.includes("image")) {
+            // is not a real image --> delete
+            console.log("onAfterUpload, not an image: ", file.path);
+            console.log("deleted", file.path);
+            this.remove(file._id);
+          }
+        })
+      );
     }
-  }
+  },
 });
 ```

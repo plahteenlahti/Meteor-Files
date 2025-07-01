@@ -2,45 +2,44 @@
 
 Remove records from FilesCollection and files from FS.
 
-- `selector` {*Object*} - See [Mongo Selectors](http://docs.meteor.com/#selectors)
-- `cb` {*Function*} - Callback, with one `error` argument
-- Returns {*FilesCollection*} - Current FilesCollection instance
+- `selector` {_Object_} - See [Mongo Selectors](http://docs.meteor.com/#selectors)
+- `cb` {_Function_} - Callback, with one `error` argument
+- Returns {_FilesCollection_} - Current FilesCollection instance
 
 ```js
-import { FilesCollection } from 'meteor/ostrio:files';
+import { FilesCollection } from "meteor/plahteenlahti:files";
 
-const imagesCollection = new FilesCollection({collectionName: 'images'});
+const imagesCollection = new FilesCollection({ collectionName: "images" });
 
 // Usage:
 // Drop collection's data and remove all associated files from FS
 imagesCollection.remove({});
 // Remove particular file
-imagesCollection.remove({_id: 'Rfy2HLutYK4XWkwhm'});
+imagesCollection.remove({ _id: "Rfy2HLutYK4XWkwhm" });
 // Equals to above
-imagesCollection.findOne({_id: 'Rfy2HLutYK4XWkwhm'}).remove();
-
+imagesCollection.findOne({ _id: "Rfy2HLutYK4XWkwhm" }).remove();
 
 // Direct Collection usage
 // Remove record(s) ONLY from collection
 imagesCollection.collection.remove({});
 
 // Using callback
-imagesCollection.remove({_id: 'Rfy2HLutYK4XWkwhm'}, (error) => {
+imagesCollection.remove({ _id: "Rfy2HLutYK4XWkwhm" }, (error) => {
   if (error) {
     console.error(`File wasn't removed, error:  ${error.reason}`);
   } else {
-    console.info('File successfully removed');
+    console.info("File successfully removed");
   }
 });
 ```
 
-*Use onBeforeRemove to avoid unauthorized actions, for more info see [onBeforeRemove callback](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/constructor.md#use-onbeforeremove-to-avoid-unauthorized-remove)*
+_Use onBeforeRemove to avoid unauthorized actions, for more info see [onBeforeRemove callback](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/constructor.md#use-onbeforeremove-to-avoid-unauthorized-remove)_
 
 ```js
-import { FilesCollection } from 'meteor/ostrio:files';
+import { FilesCollection } from "meteor/plahteenlahti:files";
 
 const imagesCollection = new FilesCollection({
-  collectionName: 'images',
+  collectionName: "images",
   allowClientCode: true,
   onBeforeRemove(cursor) {
     const records = cursor.fetch();
@@ -63,6 +62,6 @@ const imagesCollection = new FilesCollection({
     }
 
     return true;
-  }
+  },
 });
 ```

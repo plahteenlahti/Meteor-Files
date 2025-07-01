@@ -15,19 +15,19 @@ The sync will happen without clients (browsers/devices) being involved and the f
 First create three Methods in P that each share one of the three crucial Parts of a `FilesCollection`:
 
 - Sharing the `FilesCollection`'s documents
-- Sharing the `fs.files`* metadata for the files' respective subversions
-- Sharing the `fs.chunks`* (the actual data) of all stored files and their subversions
+- Sharing the `fs.files`\* metadata for the files' respective subversions
+- Sharing the `fs.chunks`\* (the actual data) of all stored files and their subversions
 
-*This assumes the [default configuration of your GridFS](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/gridfs-bucket-integration.md) which is by default using the `db.fs.files` and `db.fs.chunks` collections.*
+_This assumes the [default configuration of your GridFS](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/gridfs-bucket-integration.md) which is by default using the `db.fs.files` and `db.fs.chunks` collections._
 
-*For custom configuration you may consult the JS Mongo Native Driver documentation on [GridFSBucket](http://mongodb.github.io/node-mongodb-native/3.6/api/GridFSBucket.html).*
+_For custom configuration you may consult the JS Mongo Native Driver documentation on [GridFSBucket](http://mongodb.github.io/node-mongodb-native/3.6/api/GridFSBucket.html)._
 
 #### P/server/sync.js
 
 ```js
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
-import { FilesCollection } from 'meteor/ostrio:files'
+import { FilesCollection } from 'meteor/plahteenlahti:files'
 
 const ImageFiles = new FilesCollection({ ... })
 
@@ -58,7 +58,7 @@ import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
 import { DDP } from 'meteor/ddp-client'
 import { Tracker } from 'meteor/tracker'
-import { FilesCollection } from 'meteor/ostrio:files'
+import { FilesCollection } from 'meteor/plahteenlahti:files'
 
 const ImageFiles = new FilesCollection({ ... })
 const FsFiles = new Mongo.Collection('fs.files')
@@ -86,12 +86,12 @@ function insertUpdate(collection, doc) {
 function synchronize (trackerComputation) {
   // skip if not yet connected
   if (!remoteConnection.status().connected) return
-  
+
   remoteConnection.call('getFilesDocuments', (err, filesDocuments) => {
     // handle err
     filesDocuments.forEach(filesDoc => insertUpdate(ImageFiles.collection, filesDoc))
   })
-  
+
   remoteConnection.call('getFilesMetadata', (err, filesMetdadata) => {
     // handle err
     filesMetdadata.forEach(metadataDoc => insertUpdate(FsFiles, metadataDoc))
@@ -117,14 +117,13 @@ In your Consumer application C you can now connect to the remote app on the serv
 
 ```javascript
 Meteor.startup(() => {
-  const url = 'p.domain.tld' // get url of P, for example via process.env or Meteor.settings
-  remoteConnection = DDP.connect(url)
+  const url = "p.domain.tld"; // get url of P, for example via process.env or Meteor.settings
+  remoteConnection = DDP.connect(url);
 
   // use Tracker to run the sync when the remoteConnection is "connected"
-  const synchronizeTracker = Meteor.bindEnvironment(synchronize)
-  Tracker.autorun(synchronizeTracker)
-})
-
+  const synchronizeTracker = Meteor.bindEnvironment(synchronize);
+  Tracker.autorun(synchronizeTracker);
+});
 ```
 
 ### Further considerations

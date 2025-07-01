@@ -1,9 +1,13 @@
+#
+
+Fork of [ostrio:files](https://github.com/veliovgroup/Meteor-Files)
+
 [![support](https://img.shields.io/badge/support-GitHub-white)](https://github.com/sponsors/dr-dimitru)
 [![support](https://img.shields.io/badge/support-PayPal-white)](https://paypal.me/veliovgroup)
-[![Mentioned in Awesome ostrio:files](https://awesome.re/mentioned-badge.svg)](https://project-awesome.org/Urigo/awesome-meteor#files)
+[![Mentioned in Awesome plahteenlahti:files](https://awesome.re/mentioned-badge.svg)](https://project-awesome.org/Urigo/awesome-meteor#files)
 [![GitHub stars](https://img.shields.io/github/stars/veliovgroup/Meteor-Files.svg)](https://github.com/veliovgroup/Meteor-Files/stargazers)
 <a href="https://ostr.io/info/built-by-developers-for-developers">
-  <img src="https://ostr.io/apple-touch-icon-60x60.png" height="20">
+<img src="https://ostr.io/apple-touch-icon-60x60.png" height="20">
 </a>
 
 # Files for Meteor.js
@@ -13,7 +17,7 @@ Stable, fast, robust, and well-maintained Meteor.js package for files management
 ## ToC:
 
 - [📔 Documentation](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/toc.md) - Docs, API, Demos, Examples
-- __⚡️ Quick start__:
+- **⚡️ Quick start**:
   - [🔧 Installation](https://github.com/veliovgroup/Meteor-Files#installation)
   - [👨‍💻 API examples](https://github.com/veliovgroup/Meteor-Files#api-overview):
     - [Initialize Collection](https://github.com/veliovgroup/Meteor-Files#new-filescollectionconfig-isomorphic)
@@ -34,17 +38,17 @@ Stable, fast, robust, and well-maintained Meteor.js package for files management
 - Compatible with all front-end frameworks from Blaze to [React](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/react-example.md)
 - Upload via `HTTP` and `DDP` transports, [read about difference](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/about-transports.md)
 - Sustainable and "resumable" uploads will resume upon connection interruption or server reboot
-- Upload files through computing cloud without persistent File System, like Heroku (*"resumable" uploads are not supported on Heroku and alike*)
-- Use *[GridFS](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/gridfs-bucket-integration.md#use-gridfs-with-gridfsbucket-as-a-storage)*, *[AWS S3](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/aws-s3-integration.md)*, *[Google Storage](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/google-cloud-storage-integration.md)* or *[DropBox](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/dropbox-integration.md)* and other (*[3rd-party storage](hhttps://github.com/veliovgroup/Meteor-Files/blob/master/docs/3rd-party-storage.md)*)
-- APIs for checking file mime-type, size, extension, an other file's properties before upload using *[`onBeforeUpload` hook](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/constructor.md)*
-- APIs for [resizing images](https://github.com/veliovgroup/meteor-files-website/blob/master/imports/server/image-processing.js#L19), *[subversions management](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/file-subversions.md)*, and other post-processing tasks using *[`onAfterUpload` hook](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/constructor.md)*
+- Upload files through computing cloud without persistent File System, like Heroku (_"resumable" uploads are not supported on Heroku and alike_)
+- Use _[GridFS](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/gridfs-bucket-integration.md#use-gridfs-with-gridfsbucket-as-a-storage)_, _[AWS S3](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/aws-s3-integration.md)_, _[Google Storage](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/google-cloud-storage-integration.md)_ or _[DropBox](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/dropbox-integration.md)_ and other (_[3rd-party storage](hhttps://github.com/veliovgroup/Meteor-Files/blob/master/docs/3rd-party-storage.md)_)
+- APIs for checking file mime-type, size, extension, an other file's properties before upload using _[`onBeforeUpload` hook](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/constructor.md)_
+- APIs for [resizing images](https://github.com/veliovgroup/meteor-files-website/blob/master/imports/server/image-processing.js#L19), _[subversions management](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/file-subversions.md)_, and other post-processing tasks using _[`onAfterUpload` hook](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/constructor.md)_
 
 ## Installation:
 
-Install [`ostrio:files` from Atmosphere](https://atmospherejs.com/ostrio/files)
+Install [`plahteenlahti:files` from Atmosphere](https://atmospherejs.com/ostrio/files)
 
 ```shell
-meteor add ostrio:files
+meteor add plahteenlahti:files
 ```
 
 ### ES6 Import:
@@ -52,7 +56,7 @@ meteor add ostrio:files
 Import in isomorphic location (e.g. on server and client)
 
 ```js
-import { FilesCollection } from 'meteor/ostrio:files';
+import { FilesCollection } from "meteor/plahteenlahti:files";
 ```
 
 ## API overview
@@ -77,27 +81,27 @@ Read full docs for [`FilesCollection` Constructor](https://github.com/veliovgrou
 Shared code:
 
 ```js
-import { Meteor } from 'meteor/meteor';
-import { FilesCollection } from 'meteor/ostrio:files';
+import { Meteor } from "meteor/meteor";
+import { FilesCollection } from "meteor/plahteenlahti:files";
 
 const imagesCollection = new FilesCollection({
-  collectionName: 'images',
+  collectionName: "images",
   allowClientCode: false, // Disallow remove files from Client
   onBeforeUpload(file) {
     // Allow upload files under 10MB, and only in png/jpg/jpeg formats
     if (file.size <= 10485760 && /png|jpg|jpeg/i.test(file.extension)) {
       return true;
     }
-    return 'Please upload image, with size equal or less than 10MB';
-  }
+    return "Please upload image, with size equal or less than 10MB";
+  },
 });
 
 if (Meteor.isClient) {
-  Meteor.subscribe('files.images.all');
+  Meteor.subscribe("files.images.all");
 }
 
 if (Meteor.isServer) {
-  Meteor.publish('files.images.all', function () {
+  Meteor.publish("files.images.all", function () {
     return imagesCollection.find().cursor;
   });
 }
@@ -111,11 +115,10 @@ Upload form (template):
 
 ```html
 <template name="uploadForm">
-  {{#with currentUpload}}
-    Uploading <b>{{file.name}}</b>:
-    <span id="progress">{{progress.get}}%</span>
+  {{#with currentUpload}} Uploading <b>{{file.name}}</b>:
+  <span id="progress">{{progress.get}}%</span>
   {{else}}
-    <input id="fileInput" type="file" />
+  <input id="fileInput" type="file" />
   {{/with}}
 </template>
 ```
@@ -123,16 +126,16 @@ Upload form (template):
 Shared code:
 
 ```js
-import { FilesCollection } from 'meteor/ostrio:files';
-const imagesCollection = new FilesCollection({collectionName: 'images'});
+import { FilesCollection } from "meteor/plahteenlahti:files";
+const imagesCollection = new FilesCollection({ collectionName: "images" });
 export default imagesCollection; // import in other files
 ```
 
 Client's code:
 
 ```js
-import { Template } from 'meteor/templating';
-import { ReactiveVar } from 'meteor/reactive-var';
+import { Template } from "meteor/templating";
+import { ReactiveVar } from "meteor/reactive-var";
 Template.uploadForm.onCreated(function () {
   this.currentUpload = new ReactiveVar(false);
 });
@@ -140,24 +143,27 @@ Template.uploadForm.onCreated(function () {
 Template.uploadForm.helpers({
   currentUpload() {
     return Template.instance().currentUpload.get();
-  }
+  },
 });
 
 Template.uploadForm.events({
-  'change #fileInput'(e, template) {
+  "change #fileInput"(e, template) {
     if (e.currentTarget.files && e.currentTarget.files[0]) {
       // We upload only one file, in case
       // multiple files were selected
-      const upload = imagesCollection.insert({
-        file: e.currentTarget.files[0],
-        chunkSize: 'dynamic'
-      }, false);
+      const upload = imagesCollection.insert(
+        {
+          file: e.currentTarget.files[0],
+          chunkSize: "dynamic",
+        },
+        false
+      );
 
-      upload.on('start', function () {
+      upload.on("start", function () {
         template.currentUpload.set(this);
       });
 
-      upload.on('end', function (error, fileObj) {
+      upload.on("end", function (error, fileObj) {
         if (error) {
           alert(`Error during upload: ${error}`);
         } else {
@@ -168,28 +174,28 @@ Template.uploadForm.events({
 
       upload.start();
     }
-  }
+  },
 });
 ```
 
 For multiple file upload see [this demo code](https://github.com/veliovgroup/meteor-files-website/blob/master/imports/client/upload/upload-form.js#L130).
 
-Upload base64 string (*introduced in v1.7.1*):
+Upload base64 string (_introduced in v1.7.1_):
 
 ```js
 // As dataURI
 imagesCollection.insert({
-  file: 'data:image/png,base64str…',
+  file: "data:image/png,base64str…",
   isBase64: true, // <— Mandatory
-  fileName: 'pic.png' // <— Mandatory
+  fileName: "pic.png", // <— Mandatory
 });
 
 // As plain base64:
 imagesCollection.insert({
-  file: 'base64str…',
+  file: "base64str…",
   isBase64: true, // <— Mandatory
-  fileName: 'pic.png', // <— Mandatory
-  type: 'image/png' // <— Mandatory
+  fileName: "pic.png", // <— Mandatory
+  type: "image/png", // <— Mandatory
 });
 ```
 
@@ -202,11 +208,11 @@ To display files you can use `fileURL` template helper or `.link()` method of `F
 Template:
 
 ```html
-<template name='file'>
+<template name="file">
   <img src="{{imageFile.link}}" alt="{{imageFile.name}}" />
   <!-- Same as: -->
   <!-- <img src="{{fileURL imageFile}}" alt="{{imageFile.name}}" /> -->
-  <hr>
+  <hr />
   <video height="auto" controls="controls">
     <source src="{{videoFile.link}}?play=true" type="{{videoFile.type}}" />
     <!-- Same as: -->
@@ -218,34 +224,40 @@ Template:
 Shared code:
 
 ```js
-import { Meteor } from 'meteor/meteor';
-import { FilesCollection } from 'meteor/ostrio:files';
+import { Meteor } from "meteor/meteor";
+import { FilesCollection } from "meteor/plahteenlahti:files";
 
-const imagesCollection = new FilesCollection({collectionName: 'images'});
-const videosCollection = new FilesCollection({collectionName: 'videos'});
+const imagesCollection = new FilesCollection({ collectionName: "images" });
+const videosCollection = new FilesCollection({ collectionName: "videos" });
 
 if (Meteor.isServer) {
   // Upload sample files on server's startup:
   Meteor.startup(() => {
-    imagesCollection.load('https://raw.githubusercontent.com/veliovgroup/Meteor-Files/master/logo.png', {
-      fileName: 'logo.png'
-    });
-    videosCollection.load('http://www.sample-videos.com/video/mp4/240/big_buck_bunny_240p_5mb.mp4', {
-      fileName: 'Big-Buck-Bunny.mp4'
-    });
+    imagesCollection.load(
+      "https://raw.githubusercontent.com/veliovgroup/Meteor-Files/master/logo.png",
+      {
+        fileName: "logo.png",
+      }
+    );
+    videosCollection.load(
+      "http://www.sample-videos.com/video/mp4/240/big_buck_bunny_240p_5mb.mp4",
+      {
+        fileName: "Big-Buck-Bunny.mp4",
+      }
+    );
   });
 
-  Meteor.publish('files.images.all', function () {
+  Meteor.publish("files.images.all", function () {
     return imagesCollection.find().cursor;
   });
 
-  Meteor.publish('files.videos.all', function () {
+  Meteor.publish("files.videos.all", function () {
     return videosCollection.find().cursor;
   });
 } else {
   // Subscribe to file's collections on Client
-  Meteor.subscribe('files.images.all');
-  Meteor.subscribe('files.videos.all');
+  Meteor.subscribe("files.images.all");
+  Meteor.subscribe("files.videos.all");
 }
 ```
 
@@ -258,7 +270,7 @@ Template.file.helpers({
   },
   videoFile() {
     return videosCollection.findOne();
-  }
+  },
 });
 ```
 
@@ -269,8 +281,12 @@ For more expressive example see [Streaming demo app](https://github.com/veliovgr
 Template:
 
 ```html
-<template name='file'>
-  <a href="{{file.link}}?download=true" download="{{file.name}}" target="_parent">
+<template name="file">
+  <a
+    href="{{file.link}}?download=true"
+    download="{{file.name}}"
+    target="_parent"
+  >
     {{file.name}}
   </a>
 </template>
@@ -279,25 +295,28 @@ Template:
 Shared code:
 
 ```js
-import { Meteor } from 'meteor/meteor';
-import { FilesCollection } from 'meteor/ostrio:files';
-const imagesCollection = new FilesCollection({collectionName: 'images'});
+import { Meteor } from "meteor/meteor";
+import { FilesCollection } from "meteor/plahteenlahti:files";
+const imagesCollection = new FilesCollection({ collectionName: "images" });
 
 if (Meteor.isServer) {
   // Load sample image into FilesCollection on server's startup:
   Meteor.startup(function () {
-    imagesCollection.load('https://raw.githubusercontent.com/veliovgroup/Meteor-Files/master/logo.png', {
-      fileName: 'logo.png',
-      meta: {}
-    });
+    imagesCollection.load(
+      "https://raw.githubusercontent.com/veliovgroup/Meteor-Files/master/logo.png",
+      {
+        fileName: "logo.png",
+        meta: {},
+      }
+    );
   });
 
-  Meteor.publish('files.images.all', function () {
+  Meteor.publish("files.images.all", function () {
     return imagesCollection.find().cursor;
   });
 } else {
   // Subscribe on the client
-  Meteor.subscribe('files.images.all');
+  Meteor.subscribe("files.images.all");
 }
 ```
 
@@ -307,7 +326,7 @@ Client's code:
 Template.file.helpers({
   fileRef() {
     return imagesCollection.findOne();
-  }
+  },
 });
 ```
 
@@ -315,14 +334,14 @@ For more expressive example see [Download demo](https://github.com/veliovgroup/M
 
 ## FAQ:
 
-1. __Where are files stored by default?__: by default if `config.storagePath` isn't passed into [*Constructor*](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/constructor.md) it's equals to `assets/app/uploads` and relative to running script:
-    - __a.__ On `development` stage: `yourDevAppDir/.meteor/local/build/programs/server`. __Note: All files will be removed as soon as your application rebuilds__ or you run `meteor reset`. To keep your storage persistent during development use an absolute path *outside of your project folder*, e.g. `/data` directory.
-    - __b.__ On `production`: `yourProdAppDir/programs/server`. __Note: If using MeteorUp (MUP), Docker volumes must to be added to__ `mup.json`, see [MUP usage](hhttps://github.com/veliovgroup/Meteor-Files/blob/master/docs/meteorup-usage.md)
-2. __Cordova usage and development__: With support of community we do regular testing on virtual and real devices. To make sure `Meteor-Files` library runs smoothly in Cordova environment — enable [withCredentials](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials); enable `{allowQueryStringCookies: true}` and `{allowedOrigins: true}` on both `Client` and `Server`. For more details read [Cookie's repository FAQ](https://github.com/veliovgroup/Meteor-Cookies#faq)
-3. __How to pause/continue upload and get progress/speed/remaining time?__: see *Object* returned from [`insert` method](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/insert.md)
-4. When using any of `accounts` packages - package `accounts-base` must be explicitly added to `.meteor/packages` above `ostrio:files`
-5. __cURL/POST uploads__ - Take a look on [POST-Example](https://github.com/noris666/Meteor-Files-POST-Example) by [@noris666](https://github.com/noris666)
-6. In __Safari__ (Mobile and Desktop) for `DDP` chunk size is reduced by algorithm, due to error thrown if frame is too big. Limit simultaneous uploads to `6` is recommended for Safari. This issue should be fixed in Safari 11. Switching to `http` transport (*which has no such issue*) is recommended for Safari. See [#458](https://github.com/veliovgroup/Meteor-Files/issues/458)
+1. **Where are files stored by default?**: by default if `config.storagePath` isn't passed into [_Constructor_](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/constructor.md) it's equals to `assets/app/uploads` and relative to running script:
+   - **a.** On `development` stage: `yourDevAppDir/.meteor/local/build/programs/server`. **Note: All files will be removed as soon as your application rebuilds** or you run `meteor reset`. To keep your storage persistent during development use an absolute path _outside of your project folder_, e.g. `/data` directory.
+   - **b.** On `production`: `yourProdAppDir/programs/server`. **Note: If using MeteorUp (MUP), Docker volumes must to be added to** `mup.json`, see [MUP usage](hhttps://github.com/veliovgroup/Meteor-Files/blob/master/docs/meteorup-usage.md)
+2. **Cordova usage and development**: With support of community we do regular testing on virtual and real devices. To make sure `Meteor-Files` library runs smoothly in Cordova environment — enable [withCredentials](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials); enable `{allowQueryStringCookies: true}` and `{allowedOrigins: true}` on both `Client` and `Server`. For more details read [Cookie's repository FAQ](https://github.com/veliovgroup/Meteor-Cookies#faq)
+3. **How to pause/continue upload and get progress/speed/remaining time?**: see _Object_ returned from [`insert` method](https://github.com/veliovgroup/Meteor-Files/blob/master/docs/insert.md)
+4. When using any of `accounts` packages - package `accounts-base` must be explicitly added to `.meteor/packages` above `plahteenlahti:files`
+5. **cURL/POST uploads** - Take a look on [POST-Example](https://github.com/noris666/Meteor-Files-POST-Example) by [@noris666](https://github.com/noris666)
+6. In **Safari** (Mobile and Desktop) for `DDP` chunk size is reduced by algorithm, due to error thrown if frame is too big. Limit simultaneous uploads to `6` is recommended for Safari. This issue should be fixed in Safari 11. Switching to `http` transport (_which has no such issue_) is recommended for Safari. See [#458](https://github.com/veliovgroup/Meteor-Files/issues/458)
 7. Make sure you're using single domain for the Meteor app, and the same domain for hosting Meteor-Files endpoints, see [#737](https://github.com/veliovgroup/Meteor-Files/issues/737) for details
 8. When proxying requests to Meteor-Files endpoint make sure protocol `http/1.1` is used, see [#742](https://github.com/veliovgroup/Meteor-Files/issues/742) for details
 
@@ -342,7 +361,7 @@ For more expressive example see [Download demo](https://github.com/veliovgroup/M
 
 Fully-featured file-sharing app
 
-- [Live: __files.veliov.com__](https://files.veliov.com)
+- [Live: **files.veliov.com**](https://files.veliov.com)
 - [Source Code Rep](https://github.com/veliovgroup/meteor-files-website#file-sharing-web-app)
 
 ## Related Packages:
@@ -361,8 +380,8 @@ Fully-featured file-sharing app
 
 ## Contribution:
 
-- __Want to help?__ Please check [issues](https://github.com/veliovgroup/Meteor-Files/issues) for open and tagged as [`help wanted` issues](https://github.com/veliovgroup/Meteor-Files/issues?q=is%3Aissue+is%3Aopen+label%3A"help+wanted");
-- __Want to contribute?__ Read and follow [PR rules](https://github.com/veliovgroup/Meteor-Files/blob/master/.github/PULL_REQUEST_TEMPLATE). All PRs are welcome on [`dev` branch](https://github.com/veliovgroup/Meteor-Files/tree/dev). Please, always give expressive description to your changes and additions.
+- **Want to help?** Please check [issues](https://github.com/veliovgroup/Meteor-Files/issues) for open and tagged as [`help wanted` issues](https://github.com/veliovgroup/Meteor-Files/issues?q=is%3Aissue+is%3Aopen+label%3A"help+wanted");
+- **Want to contribute?** Read and follow [PR rules](https://github.com/veliovgroup/Meteor-Files/blob/master/.github/PULL_REQUEST_TEMPLATE). All PRs are welcome on [`dev` branch](https://github.com/veliovgroup/Meteor-Files/tree/dev). Please, always give expressive description to your changes and additions.
 
 ## Supporters:
 
